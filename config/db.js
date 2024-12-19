@@ -1,17 +1,30 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+const { Sequelize } = require("sequelize");
 
-// Ruta del archivo de la base de datos
-const dbPath = path.resolve(__dirname, 'database.sqlite');
-
-// Crear y conectar a la base de datos
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('Error al conectar a la base de datos:', err.message);
-  } else {
-    console.log('Conectado a la base de datos SQLite.');
+class Database {
+  constructor() {
+    this.sequelize = new Sequelize({
+      dialect: "sqlite",
+      storage: "./costumers.sqlite",
+    });
   }
-});
 
-// Exportar la instancia de la base de datos
-module.exports = db;
+  async connect() {
+    try {
+      await this.sequelize.authenticate();
+      console.log("Conexión establecida correctamente");
+    } catch (error) {
+      console.error("No se pudo conectar a la base de datos:", error);
+    }
+  }
+
+  async sync() {
+    try {
+      await this.sequelize.sync();
+      console.log("Base de datos sincronizada");
+    } catch (error) {
+      console.error("Error al sincronizar la base de datos:", error);
+    }
+  }
+}
+
+module.exports = new Database();
